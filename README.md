@@ -14,10 +14,14 @@
 - Migration:
   - Once the containers are up and running, you need to apply the database migrations.
     `docker-compose run web python manage.py migrate`
+  - Create migrations.
+    `docker-compose exec web python manage.py makemigrations`
 - Tests:
     `docker-compose run web python manage.py test`
 - Stop containers:
     `docker-compose down`
+- Remove containers and volumes:
+    `docker-compose down -v`
 
 ## Other Commands
 
@@ -41,3 +45,8 @@
     `curl -X POST -d "username=testuser&password=testpassword" http://localhost:8000/api-token-auth/`
 - Use the token to access a protected endpoint:
     `curl -H "Authorization: Token <your-token>" http://localhost:8000/api/hello/`
+
+## Access Admin Page
+
+- Need to create a superuser first.
+- Navigate to `http://localhost:8000/admin/`

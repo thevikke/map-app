@@ -1,4 +1,5 @@
 Django>=3.2,<4.0
+dj_static
 django-environ
 djangorestframework
 psycopg2-binary
