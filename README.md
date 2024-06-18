@@ -41,12 +41,7 @@
     exit()
     ```
 
-- Test authentication with test user:
-    `curl -X POST -d "username=testuser&password=testpassword" http://localhost:8000/api-token-auth/`
-- Use the token to access a protected endpoint:
-    `curl -H "Authorization: Token <your-token>" http://localhost:8000/api/hello/`
-
 ## Access Admin Page
 
 - Need to create a superuser first.
-- Navigate to `http://localhost:8000/admin/`
+  - Navigate to `http://localhost:8000/admin/`

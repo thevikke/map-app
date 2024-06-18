@@ -1,5 +1,3 @@
-# api/tests.py
-
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
@@ -26,41 +24,34 @@ class AuthenticationTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_access_with_token(self):
-        # Obtain the token
         response = self.client.post('/api-token-auth/', {'username': self.username, 'password': self.password})
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
-        
-        # Access the protected endpoint
-        response = self.client.get('/api/hello/')
+
+        response = self.client.get('/api/auth/user/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['message'], 'Hello, world!')
+        self.assertEqual(response.data['username'], self.username)
 
     def test_access_without_token(self):
-        # Access the protected endpoint without a token
-        response = self.client.get('/api/hello/')
+        response = self.client.get('/api/auth/user/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-#TODO: Check the tests.
+
 class PointOfInterestAPITestCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.client.login(username='testuser', password='testpassword')
-
-    def test_authentication(self):
         response = self.client.post('/api-token-auth/', {'username': 'testuser', 'password': 'testpassword'})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('token', response.data)
         self.token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
 
     def test_add_point(self):
-        self.test_authentication()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         data = {
             "name": "Point 1",
             "description": "A description",
-            "location": "POINT (30 10)"
+            "latitude": 30.0,
+            "longitude": 10.0
         }
         response = self.client.post('/api/points/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -71,8 +62,6 @@ class PointOfInterestAPITestCase(APITestCase):
         PointOfInterest.objects.create(
             name="Point 1", description="A description", location=Point(30, 10), created_by=self.user
         )
-        self.test_authentication()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.get('/api/points/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
@@ -82,12 +71,11 @@ class PointOfInterestAPITestCase(APITestCase):
         point = PointOfInterest.objects.create(
             name="Point 1", description="A description", location=Point(30, 10), created_by=self.user
         )
-        self.test_authentication()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
         response = self.client.delete(f'/api/points/{point.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(PointOfInterest.objects.count(), 0)
 
     def test_access_without_token(self):
+        self.client.credentials()
         response = self.client.get('/api/points/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
