@@ -2,6 +2,7 @@
 
 - This API authenticates users and allows users to save marker locations to a Postgre database.
 - The infrastructure is handled with docker-compose.
+- **NOTE**: This is a `.md` document, use md-editor.
 
 ## Running
 
@@ -11,6 +12,19 @@
 
 - Build and start all containers:
     `docker-compose up --build`
+
+- Default users:
+
+    ```python
+      {'username': 'admin', 'email': 'admin@example.com', 'password': 'adminpassword'},
+      {'username': 'user1', 'email': 'user1@example.com', 'password': 'user1password'},
+      {'username': 'user2', 'email': 'user2@example.com', 'password': 'user2password'},
+    ```
+
+- Login to `http://localhost:3000`
+
+## Other Commands
+
 - Migration:
   - Once the containers are up and running, you need to apply the database migrations.
     `docker-compose run web python manage.py migrate`
@@ -22,9 +36,6 @@
     `docker-compose down`
 - Remove containers and volumes:
     `docker-compose down -v`
-
-## Other Commands
-
 - View logs:
     `docker-compose logs -f`
 - Access Django shell:

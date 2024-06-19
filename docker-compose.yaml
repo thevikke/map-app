@@ -8,9 +8,13 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
 
-  web:
-    build: .
-    command: gunicorn myproject.wsgi:application --bind 0.0.0.0:8000
+  backend:
+    build:
+      context: .
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py create_default_users &&
+             gunicorn myproject.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - .:/app
     ports:
@@ -20,5 +24,6 @@ services:
     env_file:
       - .env
 
+# TODO: Add frontend service
 volumes:
   postgres_data:
