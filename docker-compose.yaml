@@ -12,7 +12,8 @@ services:
     build:
       context: .
     command: >
-      sh -c "python manage.py migrate &&
+      sh -c "./wait-for-it.sh db:5432 -- 
+             python manage.py migrate &&
              python manage.py create_default_users &&
              gunicorn myproject.wsgi:application --bind 0.0.0.0:8000"
     volumes:
@@ -24,6 +25,14 @@ services:
     env_file:
       - .env
 
-# TODO: Add frontend service
+  frontend:
+    build:
+      context: ./map-app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
