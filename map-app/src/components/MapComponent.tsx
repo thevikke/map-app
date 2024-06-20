@@ -7,7 +7,7 @@ import { Vector as VectorSource } from "ol/source";
 import { Geometry, Point } from "ol/geom";
 import { Feature } from "ol";
 import { FeatureLike } from "ol/Feature";
-import { fromLonLat } from "ol/proj";
+import { fromLonLat, toLonLat } from "ol/proj";
 import { Style, Icon, Text, Fill, Stroke } from "ol/style";
 import { fetchPoints, addPoint, deletePoint, fetchUser } from "../services/api";
 import Overlay from "ol/Overlay";
@@ -111,7 +111,7 @@ const MapComponent: React.FC = () => {
         return;
       }
 
-      const [longitude, latitude] = fromLonLat(coordinates);
+      const [longitude, latitude] = toLonLat(coordinates);
 
       const name = prompt("Enter name:");
       const description = prompt("Enter description:");
@@ -127,7 +127,9 @@ const MapComponent: React.FC = () => {
         addPoint(newPoint)
           .then((point) => {
             const feature = new Feature({
-              geometry: new Point(coordinates),
+              geometry: new Point(
+                fromLonLat([point.longitude, point.latitude])
+              ),
               name: point.name,
               description: point.description,
               owner: user.username,
